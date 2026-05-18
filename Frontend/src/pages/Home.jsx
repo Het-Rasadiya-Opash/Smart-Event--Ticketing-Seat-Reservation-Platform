@@ -1,5 +1,11 @@
+import Events from "../components/Events";
+
 const Home = () => {
-  return <div>Home</div>;
+  return (
+    <div>
+      <Events />
+    </div>
+  );
 };
 
 export default Home;
