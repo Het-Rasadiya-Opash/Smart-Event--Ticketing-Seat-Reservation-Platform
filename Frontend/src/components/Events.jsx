@@ -157,12 +157,12 @@ const Events = () => {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 pb-20">
       <div className="relative bg-slate-900 overflow-hidden py-16 sm:py-24 shadow-inner">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-green-500/10 rounded-full blur-3xl pointer-events-none"></div>
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
           <h1 className="text-4xl sm:text-6xl font-extrabold text-white tracking-tight leading-none mb-6">
-            Smart<span className="text-indigo-500">Event</span> Reservation
+            Smart<span className="text-green-500">Event</span> Reservation
           </h1>
 
           <form
@@ -170,13 +170,13 @@ const Events = () => {
             className="max-w-4xl mx-auto bg-white/10 backdrop-blur-md p-3 sm:p-4 rounded-2xl sm:rounded-3xl border border-white/10 flex flex-col sm:flex-row gap-3 items-stretch shadow-2xl"
           >
             <div className="flex-1 relative group">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 group-focus-within:text-indigo-400 transition-colors" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 group-focus-within:text-green-400 transition-colors" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search artists, team, show, conference..."
-                className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all text-sm"
+                className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl text-white placeholder-slate-400 focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/20 transition-all text-sm"
               />
             </div>
 
@@ -188,7 +188,7 @@ const Events = () => {
                   setSelectedCity(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full pl-12 pr-8 py-3 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl text-white appearance-none focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all text-sm cursor-pointer"
+                className="w-full pl-12 pr-8 py-3 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl text-white appearance-none focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/20 transition-all text-sm cursor-pointer"
               >
                 <option value="" className="text-slate-800">
                   All Cities
@@ -203,7 +203,7 @@ const Events = () => {
 
             <button
               type="submit"
-              className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-xl sm:rounded-2xl transition-all shadow-lg hover:shadow-indigo-500/20 focus:outline-none focus:ring-4 focus:ring-indigo-500/20 flex items-center justify-center gap-2"
+              className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-xl sm:rounded-2xl transition-all shadow-lg hover:shadow-green-500/20 focus:outline-none focus:ring-4 focus:ring-green-500/20 flex items-center justify-center gap-2"
             >
               <span>Search</span>
               <ArrowRight className="w-4 h-4" />
@@ -212,21 +212,21 @@ const Events = () => {
 
           <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-12 mt-12 text-slate-400 border-t border-slate-800 pt-8 max-w-4xl mx-auto">
             <div className="flex items-center gap-2.5">
-              <Ticket className="w-5 h-5 text-indigo-400" />
+              <Ticket className="w-5 h-5 text-green-400" />
               <span className="text-sm font-medium">
                 <strong className="text-white text-base">{totalEvents}</strong>{" "}
                 Live Events
               </span>
             </div>
             <div className="flex items-center gap-2.5">
-              <MapPin className="w-5 h-5 text-indigo-400" />
+              <MapPin className="w-5 h-5 text-green-400" />
               <span className="text-sm font-medium">
                 <strong className="text-white text-base">20+</strong> Active
                 Cities
               </span>
             </div>
             <div className="flex items-center gap-2.5">
-              <Users className="w-5 h-5 text-indigo-400" />
+              <Users className="w-5 h-5 text-green-400" />
               <span className="text-sm font-medium">
                 <strong className="text-white text-base">99.8%</strong> Happy
                 Bookings
@@ -242,13 +242,13 @@ const Events = () => {
             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-100">
                 <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2 uppercase tracking-wider">
-                  <Layers2 className="w-4 h-4 text-indigo-500" />
+                  <Layers2 className="w-4 h-4 text-green-500" />
                   Categories
                 </h3>
                 {selectedCategory && (
                   <button
                     onClick={() => setSelectedCategory("")}
-                    className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold transition-colors"
+                    className="text-xs text-green-600 hover:text-green-800 font-semibold transition-colors"
                   >
                     Clear
                   </button>
@@ -262,7 +262,7 @@ const Events = () => {
                   }}
                   className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center justify-between ${
                     !selectedCategory
-                      ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/10"
+                      ? "bg-green-600 text-white shadow-md shadow-green-600/10"
                       : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                   }`}
                 >
@@ -283,7 +283,7 @@ const Events = () => {
                       }}
                       className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center justify-between ${
                         isSelected
-                          ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/10"
+                          ? "bg-green-600 text-white shadow-md shadow-green-600/10"
                           : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                       }`}
                     >
@@ -359,7 +359,7 @@ const Events = () => {
 
                 <button
                   onClick={handleResetFilters}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-6 rounded-xl transition-all shadow-lg hover:shadow-indigo-500/20"
+                  className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 px-6 rounded-xl transition-all shadow-lg hover:shadow-green-500/20"
                 >
                   Clear All Filters
                 </button>
@@ -397,7 +397,7 @@ const Events = () => {
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         ) : (
-                          <div className="w-full h-full bg-gradient-to-tr from-indigo-900 to-slate-900 flex items-center justify-center p-6 text-center select-none">
+                          <div className="w-full h-full bg-gradient-to-tr from-green-900 to-slate-900 flex items-center justify-center p-6 text-center select-none">
                             <span className="text-white/40 font-bold text-lg leading-tight tracking-wide uppercase">
                               {event.title}
                             </span>
@@ -417,7 +417,7 @@ const Events = () => {
 
                         <div className="absolute bottom-4 left-4 right-4 text-white flex justify-between items-end">
                           <div className="flex items-center gap-1 text-white/90 text-xs font-medium bg-black/40 backdrop-blur-sm px-2.5 py-1.5 rounded-lg border border-white/10">
-                            <MapPin className="w-3.5 h-3.5 text-indigo-400" />
+                            <MapPin className="w-3.5 h-3.5 text-green-400" />
                             <span>{event.city}</span>
                           </div>
                         </div>
@@ -425,7 +425,7 @@ const Events = () => {
 
                       <div className="p-6 flex-1 flex flex-col justify-between">
                         <div>
-                          <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-indigo-600 transition-colors line-clamp-1">
+                          <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-green-600 transition-colors line-clamp-1">
                             {event.title}
                           </h3>
 
@@ -494,7 +494,7 @@ const Events = () => {
                               </p>
                             </div>
 
-                            <button className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs py-2.5 px-4 rounded-xl transition-all shadow-md shadow-indigo-600/10 flex items-center gap-1 group-hover:bg-indigo-700 animate-fade-in">
+                            <button className="bg-green-600 hover:bg-green-700 text-white font-semibold text-xs py-2.5 px-4 rounded-xl transition-all shadow-md shadow-green-600/10 flex items-center gap-1 group-hover:bg-green-700 animate-fade-in">
                               <span>View Details</span>
                               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                             </button>
@@ -527,7 +527,7 @@ const Events = () => {
                         onClick={() => setCurrentPage(num)}
                         className={`w-9 h-9 font-bold text-xs rounded-xl transition-all ${
                           currentPage === num
-                            ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/10"
+                            ? "bg-green-600 text-white shadow-md shadow-green-600/10"
                             : "border border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                         }`}
                       >

@@ -30,8 +30,8 @@ const EventDetail = ({
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-gradient-to-tr from-indigo-900 to-slate-900 flex items-center justify-center">
-                  <Ticket className="w-16 h-16 text-indigo-400/40" />
+                <div className="w-full h-full bg-gradient-to-tr from-green-900 to-slate-900 flex items-center justify-center">
+                  <Ticket className="w-16 h-16 text-green-400/40" />
                 </div>
               )}
 
@@ -45,7 +45,7 @@ const EventDetail = ({
               </button>
 
               <div className="absolute bottom-6 left-6 right-6 text-white">
-                <span className="inline-block px-3 py-1 bg-indigo-600/80 backdrop-blur-sm rounded-full text-xs font-semibold border border-indigo-400/30 mb-3 uppercase tracking-wider">
+                <span className="inline-block px-3 py-1 bg-green-600/80 backdrop-blur-sm rounded-full text-xs font-semibold border border-green-400/30 mb-3 uppercase tracking-wider">
                   {selectedEvent.category}
                 </span>
                 <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight leading-tight">
@@ -57,7 +57,7 @@ const EventDetail = ({
             <div className="overflow-y-auto p-6 space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="bg-slate-50 border border-slate-200/60 p-4 rounded-2xl flex items-center gap-3">
-                  <div className="bg-indigo-50 border border-indigo-100 p-2.5 rounded-xl text-indigo-600">
+                  <div className="bg-green-50 border border-green-100 p-2.5 rounded-xl text-green-600">
                     <CalendarDays className="w-5 h-5" />
                   </div>
                   <div>
@@ -70,7 +70,7 @@ const EventDetail = ({
                   </div>
                 </div>
                 <div className="bg-slate-50 border border-slate-200/60 p-4 rounded-2xl flex items-center gap-3">
-                  <div className="bg-indigo-50 border border-indigo-100 p-2.5 rounded-xl text-indigo-600">
+                  <div className="bg-green-50 border border-green-100 p-2.5 rounded-xl text-green-600">
                     <Clock className="w-5 h-5" />
                   </div>
                   <div>
@@ -83,7 +83,7 @@ const EventDetail = ({
                   </div>
                 </div>
                 <div className="bg-slate-50 border border-slate-200/60 p-4 rounded-2xl flex items-center gap-3">
-                  <div className="bg-indigo-50 border border-indigo-100 p-2.5 rounded-xl text-indigo-600">
+                  <div className="bg-green-50 border border-green-100 p-2.5 rounded-xl text-green-600">
                     <MapPin className="w-5 h-5" />
                   </div>
                   <div>
@@ -102,7 +102,7 @@ const EventDetail = ({
 
               <div>
                 <h4 className="text-sm font-bold text-slate-900 mb-2 uppercase tracking-wide flex items-center gap-1.5">
-                  <Info className="w-4 h-4 text-indigo-500" />
+                  <Info className="w-4 h-4 text-green-500" />
                   About the Event
                 </h4>
                 <p className="text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-100">
@@ -117,7 +117,7 @@ const EventDetail = ({
                     Venue Location
                   </h4>
                   <p className="text-xs text-slate-500 flex items-center gap-1">
-                    <MapPin className="w-4 h-4 text-indigo-500 shrink-0" />
+                    <MapPin className="w-4 h-4 text-green-500 shrink-0" />
                     {selectedEvent.venue}
                   </p>
                 </div>
@@ -126,7 +126,7 @@ const EventDetail = ({
                     Layout Configuration
                   </h4>
                   <p className="text-xs text-slate-500 flex items-center gap-1">
-                    <Layers className="w-4 h-4 text-indigo-500 shrink-0" />
+                    <Layers className="w-4 h-4 text-green-500 shrink-0" />
                     {selectedEvent.rows} rows &times;{" "}
                     {selectedEvent.seatsPerRow} seats per row (
                     {selectedEvent.analytics?.totalSeats} capacity)
@@ -136,13 +136,13 @@ const EventDetail = ({
 
               <div>
                 <h4 className="text-sm font-bold text-slate-900 mb-3 uppercase tracking-wide flex items-center gap-1.5">
-                  <Tag className="w-4 h-4 text-indigo-500" />
+                  <Tag className="w-4 h-4 text-green-500" />
                   Pricing Tiers & Tickets
                 </h4>
 
                 {detailsLoading ? (
                   <div className="flex items-center justify-center py-6">
-                    <Loader2 className="w-6 h-6 animate-spin text-indigo-600" />
+                    <Loader2 className="w-6 h-6 animate-spin text-green-600" />
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -262,7 +262,7 @@ const EventDetail = ({
                     );
                     setSelectedEvent(null);
                   }}
-                  className="flex-1 sm:flex-initial bg-indigo-600 hover:bg-indigo-700 text-white font-black px-8 py-3 rounded-xl shadow-lg shadow-indigo-600/20 transition-all text-sm flex items-center justify-center gap-1.5"
+                  className="flex-1 sm:flex-initial bg-green-600 hover:bg-green-700 text-white font-black px-8 py-3 rounded-xl shadow-lg shadow-green-600/20 transition-all text-sm flex items-center justify-center gap-1.5"
                 >
                   <Ticket className="w-4 h-4" />
                   <span>Reserve Seats Now</span>
