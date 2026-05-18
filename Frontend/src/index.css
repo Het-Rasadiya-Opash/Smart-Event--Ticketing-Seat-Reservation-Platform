@@ -1,1 +1,20 @@
 @import "tailwindcss";
+
+@theme {
+  --color-deep-navy: #0F172A;
+  --color-slate-dark: #1E293B;
+  --color-electric-indigo: #6366F1;
+  --color-indigo-light: #818CF8;
+
+  --color-seat-available: #22C55E;
+  --color-seat-hold: #F59E0B;
+  --color-seat-sold: #EF4444;
+  --color-seat-selected: #6366F1;
+
+  --color-tier-standard: #334155;
+
+  --color-surface-light: #F8FAFC;
+  --color-ui-border: #CBD5E1;
+  --color-ui-muted: #64748B;
+  --color-ui-info: #0EA5E9;
+}
