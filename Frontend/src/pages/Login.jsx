@@ -148,7 +148,6 @@ const Login = () => {
           </form>
         </div>
 
-        {/* Footer Link */}
         <p className="text-center text-gray-500 mt-8">
           Don't have an account?{" "}
           <Link
