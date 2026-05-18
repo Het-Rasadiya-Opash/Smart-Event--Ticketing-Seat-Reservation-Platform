@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import apiRequest from "../utils/apiRequest";
 import {
@@ -8,31 +8,15 @@ import {
   setError,
   setLoading,
 } from "../features/usersSlice";
-
 import {
-  Container,
-  Box,
-  Typography,
-  TextField,
-  Button,
-  InputAdornment,
-  IconButton,
-  CircularProgress,
-  Paper,
-  Stack,
-  Alert,
-  Divider,
-  Chip,
-} from "@mui/material";
-
-import {
-  EmailOutlined,
-  LockOutlined,
-  Visibility,
-  VisibilityOff,
-  ConfirmationNumberOutlined,
-  ArrowForward,
-} from "@mui/icons-material";
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  Loader2,
+  Ticket,
+} from "lucide-react";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -73,206 +57,109 @@ const Login = () => {
   };
 
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        bgcolor: "#f6f8fb",
-        display: "flex",
-        alignItems: "center",
-        py: { xs: 4, md: 6 },
-      }}
-    >
-      <Container maxWidth="lg">
-        <Paper
-          elevation={0}
-          sx={{
-            overflow: "hidden",
-            border: "1px solid",
-            borderColor: "divider",
-            borderRadius: 2,
-            display: "grid",
-            gridTemplateColumns: { xs: "1fr", md: "0.95fr 1fr" },
-            minHeight: { md: 620 },
-          }}
-        >
-          <Box
-            sx={{
-              p: { xs: 3, sm: 5, md: 6 },
-              bgcolor: "#0f172a",
-              color: "common.white",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              gap: 5,
-            }}
-          >
-            <Stack spacing={3}>
-              <Box
-                sx={{
-                  width: 58,
-                  height: 58,
-                  borderRadius: 2,
-                  display: "grid",
-                  placeItems: "center",
-                  bgcolor: "rgba(255,255,255,0.1)",
-                  border: "1px solid rgba(255,255,255,0.18)",
-                }}
-              >
-                <ConfirmationNumberOutlined sx={{ fontSize: 32 }} />
-              </Box>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-50 mb-4 border border-indigo-100">
+            <Ticket className="w-8 h-8 text-indigo-600" />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2 tracking-tight">
+            Welcome Back
+          </h1>
+          <p className="text-gray-500">
+            Sign in to manage your events and tickets
+          </p>
+        </div>
 
-              <Box>
-                <Typography
-                  component="h1"
-                  sx={{
-                    fontSize: { xs: 32, sm: 42 },
-                    fontWeight: 800,
-                    lineHeight: 1.08,
-                    maxWidth: 460,
-                  }}
-                >
-                  Smart Event Ticketing
-                </Typography>
-                <Typography
-                  sx={{
-                    mt: 2,
-                    color: "rgba(255,255,255,0.72)",
-                    fontSize: 17,
-                    lineHeight: 1.7,
-                    maxWidth: 500,
-                  }}
-                >
-                  Manage bookings, reserved seats, and event access from one
-                  focused dashboard.
-                </Typography>
-              </Box>
-            </Stack>
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm text-center">
+                {error}
+              </div>
+            )}
 
-            <Stack direction="row" spacing={1.5} useFlexGap flexWrap="wrap">
-              {["Seat maps", "Fast entry", "Live bookings"].map((item) => (
-                <Chip
-                  key={item}
-                  label={item}
-                  sx={{
-                    color: "common.white",
-                    bgcolor: "rgba(255,255,255,0.09)",
-                    border: "1px solid rgba(255,255,255,0.14)",
-                  }}
-                />
-              ))}
-            </Stack>
-          </Box>
-
-          <Box
-            sx={{
-              p: { xs: 3, sm: 5, md: 7 },
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <Box
-              component="form"
-              onSubmit={handleSubmit}
-              sx={{ width: "100%" }}
-            >
-              <Typography
-                component="h2"
-                sx={{ fontSize: { xs: 26, sm: 32 }, fontWeight: 800 }}
-              >
-                Welcome back
-              </Typography>
-              <Typography sx={{ mt: 1, color: "text.secondary" }}>
-                Sign in to continue to your event workspace.
-              </Typography>
-
-              <Divider sx={{ my: 4 }} />
-
-              <Stack spacing={2.5}>
-                {error && (
-                  <Alert severity="error" variant="outlined">
-                    {error}
-                  </Alert>
-                )}
-
-                <TextField
-                  fullWidth
-                  required
-                  label="Email address"
-                  name="email"
+            <div className="space-y-4">
+              <div className="group relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-indigo-600 transition-colors">
+                  <Mail className="w-5 h-5" />
+                </div>
+                <input
                   type="email"
+                  name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  autoComplete="email"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <EmailOutlined fontSize="small" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-
-                <TextField
-                  fullWidth
                   required
-                  label="Password"
-                  name="password"
+                  className="w-full bg-white border border-gray-300 rounded-xl py-3 pl-12 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all"
+                  placeholder="Email address"
+                />
+              </div>
+
+              <div className="group relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-indigo-600 transition-colors">
+                  <Lock className="w-5 h-5" />
+                </div>
+                <input
                   type={showPassword ? "text" : "password"}
+                  name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  autoComplete="current-password"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <LockOutlined fontSize="small" />
-                      </InputAdornment>
-                    ),
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label={
-                            showPassword ? "Hide password" : "Show password"
-                          }
-                          onClick={handleClickShowPassword}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
+                  required
+                  className="w-full bg-white border border-gray-300 rounded-xl py-3 pl-12 pr-12 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all"
+                  placeholder="Password"
                 />
-
-                <Button
-                  type="submit"
-                  variant="contained"
-                  size="large"
-                  disabled={loading}
-                  endIcon={
-                    loading ? (
-                      <CircularProgress size={18} color="inherit" />
-                    ) : (
-                      <ArrowForward />
-                    )
-                  }
-                  sx={{
-                    mt: 1,
-                    py: 1.35,
-                    textTransform: "none",
-                    fontSize: 16,
-                    fontWeight: 700,
-                    bgcolor: "#2563eb",
-                    "&:hover": { bgcolor: "#1d4ed8" },
-                  }}
+                <button
+                  type="button"
+                  onClick={handleClickShowPassword}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
                 >
-                  {loading ? "Signing in..." : "Sign in"}
-                </Button>
-              </Stack>
-            </Box>
-          </Box>
-        </Paper>
-      </Container>
-    </Box>
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end">
+              <Link
+                to="/forgot-password"
+                className="text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors"
+              >
+                Forgot password?
+              </Link>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-8 rounded-xl font-medium transition-colors focus:outline-none focus:ring-4 focus:ring-indigo-500/20 disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <>
+                  <span>Sign In</span>
+                  <ArrowRight className="w-5 h-5" />
+                </>
+              )}
+            </button>
+          </form>
+        </div>
+
+        {/* Footer Link */}
+        <p className="text-center text-gray-500 mt-8">
+          Don't have an account?{" "}
+          <Link
+            to="/register"
+            className="text-indigo-600 font-medium hover:text-indigo-700 transition-colors"
+          >
+            Create one now
+          </Link>
+        </p>
+      </div>
+    </div>
   );
 };
 
