@@ -1,5 +1,6 @@
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import OrganizerEvents from "../components/OrganizerEvents";
 import {
   User,
@@ -10,6 +11,9 @@ import {
   Ticket,
 } from "lucide-react";
 import { formatDate } from "../utils/utilities";
+import apiRequest from "../utils/apiRequest";
+import toast from "react-hot-toast";
+import MyBooking from "../components/MyBooking";
 
 const Profile = () => {
   const { currentUser } = useSelector((state) => state.users);
@@ -18,9 +22,7 @@ const Profile = () => {
   if (!currentUser) return null;
 
   const joinedDate = formatDate(currentUser.createdAt);
-
   const isOrganizer = currentUser.role === "ORGANIZER";
-
   return (
     <div className="min-h-screen bg-slate-50 pb-20">
       <div className="relative bg-slate-900 overflow-hidden py-12 shadow-inner">
@@ -114,6 +116,7 @@ const Profile = () => {
           </div>
         </div>
 
+        {!isOrganizer && <MyBooking />}
         {isOrganizer && <OrganizerEvents />}
       </div>
     </div>

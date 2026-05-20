@@ -181,6 +181,25 @@ const SeatMap = ({
     }
   };
 
+  const handleCheckout = async () => {
+    try {
+      setLoading(true);
+      const res = await apiRequest.post("/payment/create-checkout-session", {
+        eventId,
+        seatIds: selectedSeats,
+      });
+      if (res.data?.success && res.data.data?.url) {
+        window.location.href = res.data.data.url;
+      } else {
+        toast.error("Failed to initiate payment. Please try again.");
+      }
+    } catch (err) {
+      console.error("Checkout session initiation failed:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const calculateTotalPrice = () => {
     return selectedSeats.reduce((total, id) => {
       const seat = seatMap.find((s) => s.seatId === id);
@@ -447,6 +466,7 @@ const SeatMap = ({
 
                 <button
                   disabled={selectedSeats.length === 0 || loading}
+                  onClick={handleCheckout}
                   className="w-full py-4 rounded-2xl bg-green-600 hover:bg-green-700 text-white font-extrabold shadow-lg shadow-green-600/20 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer text-sm"
                 >
                   <Ticket className="w-4 h-4" />

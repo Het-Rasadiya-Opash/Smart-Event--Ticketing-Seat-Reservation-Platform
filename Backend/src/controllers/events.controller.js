@@ -1,4 +1,5 @@
 import eventModal from "../models/events.models.js";
+import bookingModel from "../models/bookings.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -535,10 +536,28 @@ export const bookSeats = asyncHandler(async (req, res) => {
     seatsToBook.push(seat);
   }
 
+  const totalAmount = seatsToBook.reduce((sum, seat) => sum + seat.price, 0);
+
+  const booking = await bookingModel.create({
+    userId,
+    eventId: id,
+    seats: seatsToBook.map((s) => ({
+      seatId: s.seatId,
+      row: s.row,
+      number: s.number,
+      tier: s.tier,
+      price: s.price,
+    })),
+    totalAmount,
+    paymentStatus: "COMPLETED",
+    paymentIntentId: "direct_" + Date.now(),
+  });
+
   seatsToBook.forEach((seat) => {
     seat.status = "SOLD";
     seat.heldBy = null;
     seat.heldUntil = null;
+    seat.bookingId = booking._id;
   });
 
   await event.save();
@@ -555,7 +574,7 @@ export const bookSeats = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(
         200,
-        { seatMap: event.seatMap },
+        { seatMap: event.seatMap, booking },
         "Seats successfully booked!",
       ),
     );
