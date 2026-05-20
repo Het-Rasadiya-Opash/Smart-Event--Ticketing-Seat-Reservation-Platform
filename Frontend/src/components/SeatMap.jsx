@@ -181,38 +181,6 @@ const SeatMap = ({
     }
   };
 
-  const handleCheckout = async () => {
-    if (selectedSeats.length === 0) {
-      toast.error("Please select at least one seat to book.");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const res = await apiRequest.post(`/events/book/${eventId}`, {
-        seatIds: selectedSeats,
-      });
-
-      if (res.data?.success) {
-        setBookedDetails({
-          seats: selectedSeats,
-          totalPrice: calculateTotalPrice(),
-          eventTitle,
-          bookingDate: new Date(),
-          ticketNo: `SE-${Math.floor(100000 + Math.random() * 900000)}`,
-        });
-        setIsBooked(true);
-        setSelectedSeats([]);
-        setHeldUntil(null);
-        toast.success("Seats successfully reserved! Enjoy your event.");
-      }
-    } catch (err) {
-      console.error("Booking checkout failed:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const calculateTotalPrice = () => {
     return selectedSeats.reduce((total, id) => {
       const seat = seatMap.find((s) => s.seatId === id);
@@ -262,7 +230,7 @@ const SeatMap = ({
           </button>
         </div>
 
-        {!isBooked ? (
+        {!isBooked && (
           <div className="flex-1 overflow-y-auto p-6 flex flex-col lg:flex-row gap-6 min-h-0">
             <div className="flex-1 bg-slate-50/50 border border-slate-200/60 rounded-2xl p-6 overflow-x-auto flex flex-col min-h-[450px] shadow-inner">
               <div className="w-full max-w-md flex flex-col items-center mb-10 shrink-0 mx-auto">
@@ -479,131 +447,12 @@ const SeatMap = ({
 
                 <button
                   disabled={selectedSeats.length === 0 || loading}
-                  onClick={handleCheckout}
                   className="w-full py-4 rounded-2xl bg-green-600 hover:bg-green-700 text-white font-extrabold shadow-lg shadow-green-600/20 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer text-sm"
                 >
                   <Ticket className="w-4 h-4" />
                   <span>Reserve & Book Seats</span>
                 </button>
               </div>
-            </div>
-          </div>
-        ) : (
-          /* Booked Confirmation Ticket Overlay */
-          <div className="flex-1 overflow-y-auto p-6 sm:p-12 flex flex-col items-center justify-center bg-slate-900/10 max-h-[80vh]">
-            <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center mb-6 animate-bounce shadow-md">
-              <CheckCircle className="w-10 h-10 stroke-[2.5]" />
-            </div>
-
-            <h3 className="text-2xl sm:text-3xl font-black text-center text-slate-900 mb-2 leading-none">
-              Reservation Successful!
-            </h3>
-            <p className="text-xs text-slate-500 text-center mb-10 max-w-sm">
-              Your tickets are confirmed. Below is your virtual booking voucher
-              pass.
-            </p>
-
-            <div className="w-full max-w-md bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-2xl relative">
-              <div className="absolute top-1/2 -translate-y-1/2 -left-3 w-6 h-6 rounded-full bg-slate-50 border-r border-slate-200/80 z-10"></div>
-              <div className="absolute top-1/2 -translate-y-1/2 -right-3 w-6 h-6 rounded-full bg-slate-50 border-l border-slate-200/80 z-10"></div>
-
-              <div className="p-6 bg-slate-50 pb-6 border-b border-dashed border-slate-200/80">
-                <span className="inline-block px-3 py-1 bg-emerald-550/10 rounded-full text-[10px] font-black border border-emerald-500/20 text-emerald-600 uppercase tracking-widest mb-3">
-                  SmartEvent Voucher
-                </span>
-                <h4 className="text-lg font-black text-slate-900 mb-1 leading-tight">
-                  {bookedDetails.eventTitle}
-                </h4>
-                <p className="text-xs text-slate-450 leading-none">
-                  Ticket No: {bookedDetails.ticketNo}
-                </p>
-
-                <div className="grid grid-cols-2 gap-4 mt-6 text-xs">
-                  <div>
-                    <span className="text-[10px] text-slate-400 font-extrabold uppercase block mb-1">
-                      Customer Name
-                    </span>
-                    <span className="font-bold text-slate-700">
-                      {currentUser?.username}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 font-extrabold uppercase block mb-1">
-                      Date of Purchase
-                    </span>
-                    <span className="font-bold text-slate-700">
-                      {new Date(bookedDetails.bookingDate).toLocaleDateString()}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-6 bg-white pt-6">
-                <div className="flex justify-between items-center mb-6">
-                  <div>
-                    <span className="text-[10px] text-slate-400 font-extrabold uppercase block mb-1">
-                      Allocated Seats
-                    </span>
-                    <div className="flex flex-wrap gap-1.5 mt-0.5">
-                      {bookedDetails.seats.map((id) => (
-                        <span
-                          key={id}
-                          className="px-2.5 py-1 bg-slate-50 border border-slate-200/80 rounded text-xs font-extrabold text-slate-700"
-                        >
-                          {id}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-[10px] text-slate-400 font-extrabold uppercase block mb-1">
-                      Total Paid
-                    </span>
-                    <span className="text-xl font-black text-emerald-650">
-                      ₹{bookedDetails.totalPrice.toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="w-full bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 flex flex-col items-center justify-center gap-1.5 shrink-0 select-none">
-                  <div className="h-10 w-full flex items-center justify-center gap-0.5 overflow-hidden">
-                    {Array.from({ length: 38 }).map((_, i) => {
-                      const widths = ["w-0.5", "w-1", "w-1.5"];
-                      const width = widths[(i * 7 + 3) % widths.length];
-                      const opacity =
-                        (i * 3) % 2 === 0 ? "opacity-75" : "opacity-30";
-                      return (
-                        <div
-                          key={i}
-                          className={`h-full bg-slate-400 ${width} ${opacity}`}
-                        ></div>
-                      );
-                    })}
-                  </div>
-                  <span className="text-[9px] font-mono text-slate-450 font-black tracking-widest leading-none">
-                    *SMARTEVENT-{bookedDetails.ticketNo}*
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-8 flex gap-4 shrink-0">
-              <button
-                onClick={() => {
-                  toast.success("Receipt ticket details saved!");
-                }}
-                className="px-6 py-3 border border-slate-300 hover:border-slate-400 hover:bg-slate-50 text-slate-750 font-extrabold rounded-xl transition-all text-xs flex items-center gap-1.5 cursor-pointer shadow-sm"
-              >
-                <Download className="w-4 h-4" />
-                <span>Save Receipt Voucher</span>
-              </button>
-              <button
-                onClick={onClose}
-                className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-extrabold rounded-xl shadow-lg shadow-green-600/20 transition-all text-xs flex items-center gap-1.5 cursor-pointer"
-              >
-                <CheckCircle className="w-4 h-4" />
-                <span>Complete Reservation</span>
-              </button>
             </div>
           </div>
         )}
