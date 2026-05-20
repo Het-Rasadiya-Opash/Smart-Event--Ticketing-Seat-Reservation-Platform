@@ -10,6 +10,7 @@ import { setCheckingAuth, setCurrentUser } from "./features/usersSlice";
 import { useDispatch } from "react-redux";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CreateEvent from "./pages/CreateEvent";
+import Profile from "./pages/Profile";
 
 const App = () => {
   const location = useLocation();
@@ -44,6 +45,7 @@ const App = () => {
         <Route path="/events" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/profile" element={<Profile />} />
         <Route element={<ProtectedRoute allowedRoles={["ORGANIZER"]} />}>
           <Route path="/create-event" element={<CreateEvent />} />
         </Route>

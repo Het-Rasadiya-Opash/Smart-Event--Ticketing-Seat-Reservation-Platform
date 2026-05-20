@@ -310,3 +310,14 @@ export const deleteEvent = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, null, "Event deleted successfully"));
 });
+
+export const eventFetchByOrganizer = asyncHandler(async (req, res) => {
+  const organizerId = req.user._id;
+  const events = await eventModal
+    .find({ organizerId, isDeleted: { $ne: true } })
+    .select("-seatMap")
+    .sort({ createdAt: -1 });
+  return res
+    .status(200)
+    .json(new ApiResponse(200, events, "Events fetched successfully"));
+});
