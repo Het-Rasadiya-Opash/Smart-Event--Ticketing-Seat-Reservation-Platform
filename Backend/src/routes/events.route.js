@@ -9,6 +9,9 @@ import {
   deleteEvent,
   eventFetchByOrganizer,
   manageStatusEvents,
+  holdSeats,
+  releaseSeats,
+  bookSeats,
 } from "../controllers/events.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 const router = express.Router();
@@ -53,5 +56,9 @@ router.delete(
   authorizeRole("ORGANIZER"),
   deleteEvent,
 );
+
+router.post("/hold/:id", authMiddleware, holdSeats);
+router.post("/release/:id", authMiddleware, releaseSeats);
+router.post("/book/:id", authMiddleware, bookSeats);
 
 export default router;

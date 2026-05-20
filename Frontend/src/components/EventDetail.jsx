@@ -1,3 +1,6 @@
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import SeatMap from "./SeatMap";
 import {
   CalendarDays,
   Clock,
@@ -7,16 +10,20 @@ import {
   MapPin,
   Tag,
   Ticket,
+  User,
   X,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { formatDate, formatTime } from "../utils/utilities";
+
 const EventDetail = ({
   selectedEvent,
   setSelectedEvent,
   detailsLoading,
   fullEventDetails,
 }) => {
+  const [showSeatMap, setShowSeatMap] = useState(false);
+  const { currentUser } = useSelector((state) => state.users);
   return (
     <div>
       {selectedEvent && (
@@ -257,10 +264,11 @@ const EventDetail = ({
                 </button>
                 <button
                   onClick={() => {
-                    toast.success(
-                      "Proceeding to Interactive Seating map reservation...",
-                    );
-                    setSelectedEvent(null);
+                    if (!currentUser) {
+                      toast.error("Please log in to reserve seats.");
+                      return;
+                    }
+                    setShowSeatMap(true);
                   }}
                   className="flex-1 sm:flex-initial bg-green-600 hover:bg-green-700 text-white font-black px-8 py-3 rounded-xl shadow-lg shadow-green-600/20 transition-all text-sm flex items-center justify-center gap-1.5"
                 >
@@ -271,6 +279,18 @@ const EventDetail = ({
             </div>
           </div>
         </div>
+      )}
+      {showSeatMap && fullEventDetails && (
+        <SeatMap
+          eventId={selectedEvent._id}
+          eventTitle={selectedEvent.title}
+          pricingTiers={selectedEvent.pricingTiers}
+          currentUser={currentUser}
+          onClose={() => {
+            setShowSeatMap(false);
+            setSelectedEvent(null);
+          }}
+        />
       )}
     </div>
   );

@@ -304,7 +304,6 @@ const OrganizerEvents = () => {
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      {/* Status selector */}
                       <div className="relative">
                         {statusLoading === event._id ? (
                           <div className="flex items-center gap-1.5 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-500">
