@@ -21,8 +21,6 @@ export const createEvent = asyncHandler(async (req, res) => {
     pricingTiers,
   } = req.body;
 
-  console.log(req.body);
-
   if (
     !title ||
     !category ||
@@ -46,10 +44,22 @@ export const createEvent = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Seats per row must be between 1 and 500");
   }
 
+  let parsedPricingTiers = [];
+  if (pricingTiers) {
+    try {
+      parsedPricingTiers =
+        typeof pricingTiers === "string"
+          ? JSON.parse(pricingTiers)
+          : pricingTiers;
+    } catch {
+      throw new ApiError(400, "Invalid pricingTiers format");
+    }
+  }
+
   const seatMap = eventModal.buildSeatMap(
     numRows,
     numSeatsPerRow,
-    pricingTiers,
+    parsedPricingTiers,
   );
 
   let finalBannerUrl = bannerUrl || null;
@@ -82,7 +92,7 @@ export const createEvent = asyncHandler(async (req, res) => {
     saleWindowEnd,
     rows: numRows,
     seatsPerRow: numSeatsPerRow,
-    pricingTiers: pricingTiers || [],
+    pricingTiers: parsedPricingTiers,
     seatMap,
   });
 

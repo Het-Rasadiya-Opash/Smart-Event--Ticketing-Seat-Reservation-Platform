@@ -1,7 +1,15 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, NavLink, useNavigate } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
-import { Ticket, LogOut, User, Menu, X, ChevronDown } from "lucide-react";
+import {
+  Ticket,
+  LogOut,
+  User,
+  Menu,
+  X,
+  ChevronDown,
+  CalendarPlus,
+} from "lucide-react";
 import apiRequest from "../utils/apiRequest";
 import { logout } from "../features/usersSlice";
 
@@ -35,6 +43,22 @@ const Navbar = () => {
   };
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+  const desktopNavLinkClass = ({ isActive }) =>
+    `font-medium transition-colors ${
+      isActive ? "text-green-600" : "text-gray-600 hover:text-green-600"
+    }`;
+  const dropdownLinkClass = ({ isActive }) =>
+    `flex items-center gap-2 px-4 py-2 text-sm transition-colors ${
+      isActive
+        ? "bg-green-50 text-green-700"
+        : "text-gray-700 hover:bg-green-50 hover:text-green-600"
+    }`;
+  const mobileLinkClass = ({ isActive }) =>
+    `flex items-center gap-2 px-3 py-2 rounded-xl text-base font-medium transition-colors ${
+      isActive
+        ? "bg-green-50 text-green-700"
+        : "text-gray-900 hover:bg-gray-50"
+    }`;
 
   return (
     <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50 transition-all duration-300">
@@ -50,18 +74,19 @@ const Navbar = () => {
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
-            <Link
+            <NavLink
               to="/"
-              className="text-gray-600 hover:text-green-600 font-medium transition-colors"
+              end
+              className={desktopNavLinkClass}
             >
               Home
-            </Link>
-            <Link
+            </NavLink>
+            <NavLink
               to="/events"
-              className="text-gray-600 hover:text-green-600 font-medium transition-colors"
+              className={desktopNavLinkClass}
             >
               Events
-            </Link>
+            </NavLink>
 
             <div className="flex items-center gap-4 ml-4 pl-4 border-l border-gray-200">
               {currentUser ? (
@@ -95,14 +120,24 @@ const Navbar = () => {
 
                   {isProfileDropdownOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-lg py-2 animate-in fade-in slide-in-from-top-2">
-                      <Link
+                      <NavLink
                         to="/profile"
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600 transition-colors"
+                        className={dropdownLinkClass}
                         onClick={() => setIsProfileDropdownOpen(false)}
                       >
                         <User className="w-4 h-4" />
                         My Profile
-                      </Link>
+                      </NavLink>
+                      {currentUser.role === "ORGANIZER" && (
+                        <NavLink
+                          to="/create-event"
+                          className={dropdownLinkClass}
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          <CalendarPlus className="w-4 h-4" />
+                          Create Event
+                        </NavLink>
+                      )}
                       <button
                         onClick={() => {
                           setIsProfileDropdownOpen(false);
@@ -153,20 +188,21 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden border-t border-gray-200 bg-white">
           <div className="px-4 pt-2 pb-4 space-y-1">
-            <Link
+            <NavLink
               to="/"
-              className="block px-3 py-2 rounded-xl text-base font-medium text-gray-900 hover:bg-gray-50 transition-colors"
+              end
+              className={mobileLinkClass}
               onClick={toggleMobileMenu}
             >
               Home
-            </Link>
-            <Link
+            </NavLink>
+            <NavLink
               to="/events"
-              className="block px-3 py-2 rounded-xl text-base font-medium text-gray-900 hover:bg-gray-50 transition-colors"
+              className={mobileLinkClass}
               onClick={toggleMobileMenu}
             >
               Events
-            </Link>
+            </NavLink>
 
             <div className="border-t border-gray-200 mt-4 pt-4">
               {currentUser ? (
@@ -189,14 +225,24 @@ const Navbar = () => {
                       </p>
                     </div>
                   </div>
-                  <Link
+                  <NavLink
                     to="/profile"
-                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-base font-medium text-gray-900 hover:bg-gray-50 transition-colors"
+                    className={mobileLinkClass}
                     onClick={toggleMobileMenu}
                   >
                     <User className="w-5 h-5 text-gray-500" />
                     My Profile
-                  </Link>
+                  </NavLink>
+                  {currentUser.role === "ORGANIZER" && (
+                    <NavLink
+                      to="/create-event"
+                      className={mobileLinkClass}
+                      onClick={toggleMobileMenu}
+                    >
+                      <CalendarPlus className="w-5 h-5 text-gray-500" />
+                      Create Event
+                    </NavLink>
+                  )}
                   <button
                     onClick={() => {
                       toggleMobileMenu();
