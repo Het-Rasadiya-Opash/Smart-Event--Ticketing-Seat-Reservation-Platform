@@ -104,10 +104,10 @@ const Events = () => {
         searchTerm: searchTerm || undefined,
         category: selectedCategory || undefined,
         city: selectedCity || undefined,
-        status: "",
+        status: "PUBLISH",
       };
 
-      const res = await apiRequest.get("/events", { params });
+    const res = await apiRequest.get("/events", { params });
       if (res.data?.success) {
         setEvents(res.data.data.events);
         setTotalEvents(res.data.data.totalEvents);
