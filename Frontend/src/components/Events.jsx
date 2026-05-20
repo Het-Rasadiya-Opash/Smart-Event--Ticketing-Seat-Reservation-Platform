@@ -104,7 +104,7 @@ const Events = () => {
         searchTerm: searchTerm || undefined,
         category: selectedCategory || undefined,
         city: selectedCity || undefined,
-        status: "PUBLISH",
+        status: "PUBLISHED",
       };
 
     const res = await apiRequest.get("/events", { params });

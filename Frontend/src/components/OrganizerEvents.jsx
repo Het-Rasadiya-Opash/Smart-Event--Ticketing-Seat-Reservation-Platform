@@ -17,6 +17,8 @@ import {
   CircleDashed,
   Ban,
   CheckCircle2,
+  ChevronDown,
+  Loader2,
 } from "lucide-react";
 
 const STATUS_CONFIG = {
@@ -42,11 +44,14 @@ const STATUS_CONFIG = {
   },
 };
 
+const STATUSES = ["DRAFT", "PUBLISHED", "CANCELLED", "COMPLETED"];
+
 const OrganizerEvents = () => {
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [statusLoading, setStatusLoading] = useState(null);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -61,6 +66,20 @@ const OrganizerEvents = () => {
     };
     fetchEvents();
   }, []);
+
+  const handleStatusChange = async (eventId, newStatus) => {
+    setStatusLoading(eventId);
+    try {
+      await apiRequest.patch(`/events/status/${eventId}`, { status: newStatus });
+      setEvents((prev) =>
+        prev.map((e) => (e._id === eventId ? { ...e, status: newStatus } : e))
+      );
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to update status.");
+    } finally {
+      setStatusLoading(null);
+    }
+  };
 
   const totalSeats = events.reduce(
     (s, e) => s + (e.analytics?.totalSeats || 0),
@@ -275,7 +294,7 @@ const OrganizerEvents = () => {
                     </div>
                   )}
 
-                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between mt-auto">
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between mt-auto gap-2">
                     <div>
                       <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
                         Revenue
@@ -284,13 +303,45 @@ const OrganizerEvents = () => {
                         ₹{(event.analytics?.totalRevenue || 0).toLocaleString()}
                       </p>
                     </div>
-                    <button
-                      onClick={() => navigate(`/events/${event._id}`)}
-                      className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-4 py-2 rounded-xl transition-all shadow-md shadow-green-600/10"
-                    >
-                      Manage
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                      {/* Status selector */}
+                      <div className="relative">
+                        {statusLoading === event._id ? (
+                          <div className="flex items-center gap-1.5 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-500">
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            Updating...
+                          </div>
+                        ) : (
+                          <div className="relative">
+                            <select
+                              value={event.status}
+                              onChange={(e) => handleStatusChange(event._id, e.target.value)}
+                              className={`appearance-none text-xs font-semibold pl-2.5 pr-7 py-2 rounded-xl border cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-500/20 transition-all ${
+                                event.status === "PUBLISHED"
+                                  ? "bg-green-50 border-green-200 text-green-700"
+                                  : event.status === "CANCELLED"
+                                  ? "bg-red-50 border-red-200 text-red-600"
+                                  : event.status === "COMPLETED"
+                                  ? "bg-blue-50 border-blue-200 text-blue-600"
+                                  : "bg-slate-100 border-slate-200 text-slate-600"
+                              }`}
+                            >
+                              {STATUSES.map((s) => (
+                                <option key={s} value={s}>{s}</option>
+                              ))}
+                            </select>
+                            <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none text-slate-400" />
+                          </div>
+                        )}
+                      </div>
+                      {/* <button
+                        onClick={() => navigate(`/events/${event._id}`)}
+                        className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-3 py-2 rounded-xl transition-all shadow-md shadow-green-600/10"
+                      >
+                        Manage
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button> */}
+                    </div>
                   </div>
                 </div>
               </div>

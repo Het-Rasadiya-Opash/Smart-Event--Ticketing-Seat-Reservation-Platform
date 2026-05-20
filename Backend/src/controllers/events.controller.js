@@ -1,7 +1,7 @@
+import eventModal from "../models/events.models.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import eventModal from "../models/events.models.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 export const createEvent = asyncHandler(async (req, res) => {
@@ -309,6 +309,39 @@ export const deleteEvent = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponse(200, null, "Event deleted successfully"));
+});
+
+export const manageStatusEvents = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  const VALID_STATUSES = ["DRAFT", "PUBLISHED", "CANCELLED", "COMPLETED"];
+  if (!status || !VALID_STATUSES.includes(status)) {
+    throw new ApiError(
+      400,
+      `Status must be one of: ${VALID_STATUSES.join(", ")}`,
+    );
+  }
+
+  const event = await eventModal.findById(id);
+  if (!event) throw new ApiError(404, "Event not found");
+
+  if (event.organizerId.toString() !== req.user._id.toString()) {
+    throw new ApiError(403, "You are not authorized to update this event");
+  }
+
+  event.status = status;
+  await event.save();
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { _id: event._id, status: event.status },
+        "Event status updated successfully",
+      ),
+    );
 });
 
 export const eventFetchByOrganizer = asyncHandler(async (req, res) => {

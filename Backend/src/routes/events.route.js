@@ -8,6 +8,7 @@ import {
   updateEvent,
   deleteEvent,
   eventFetchByOrganizer,
+  manageStatusEvents,
 } from "../controllers/events.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 const router = express.Router();
@@ -30,6 +31,13 @@ router.get(
 );
 
 router.get("/:id", getEventById);
+
+router.patch(
+  "/status/:id",
+  authMiddleware,
+  authorizeRole("ORGANIZER"),
+  manageStatusEvents,
+);
 
 router.patch(
   "/update/:id",
