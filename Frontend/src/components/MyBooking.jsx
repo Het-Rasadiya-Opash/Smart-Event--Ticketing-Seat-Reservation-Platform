@@ -119,7 +119,7 @@ const MyBooking = () => {
                 onClick={() => navigate("/events")}
                 className="bg-green-600 hover:bg-green-700 text-white font-semibold text-xs px-4 py-2 rounded-xl transition-all shadow-md active:scale-95 cursor-pointer"
               >
-                Explore Events
+                Explore Event
               </button>
             </div>
           ) : (
