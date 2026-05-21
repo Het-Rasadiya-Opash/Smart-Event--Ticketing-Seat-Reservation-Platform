@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Register from "./pages/Register";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 import { useEffect, useRef } from "react";
 import apiRequest from "./utils/apiRequest";
 import { setCheckingAuth, setCurrentUser } from "./features/usersSlice";
@@ -54,6 +55,7 @@ const App = () => {
           <Route path="/bookings" element={<MyBooking />} />
         </Route>
       </Routes>
+      {!hideNavbar && <Footer />}
     </div>
   );
 };

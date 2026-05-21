@@ -14,6 +14,7 @@ import { formatDate } from "../utils/utilities";
 import apiRequest from "../utils/apiRequest";
 import toast from "react-hot-toast";
 import MyBooking from "../components/MyBooking";
+import OrganizerGetAllBookings from "../components/OrganizerGetAllBookings";
 
 const Profile = () => {
   const { currentUser } = useSelector((state) => state.users);
@@ -117,7 +118,9 @@ const Profile = () => {
         </div>
 
         {!isOrganizer && <MyBooking />}
+
         {isOrganizer && <OrganizerEvents />}
+        {isOrganizer && <OrganizerGetAllBookings />}
       </div>
     </div>
   );

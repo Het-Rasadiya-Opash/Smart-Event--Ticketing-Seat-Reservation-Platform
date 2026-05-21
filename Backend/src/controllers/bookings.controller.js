@@ -1,4 +1,3 @@
-
 import bookingModel from "../models/bookings.model.js";
 import eventModal from "../models/events.models.js";
 import { ApiError } from "../utils/ApiError.js";
@@ -43,7 +42,10 @@ export const cancelBooking = asyncHandler(async (req, res) => {
   }
 
   if (booking.paymentStatus === "REFUNDED") {
-    throw new ApiError(400, "This booking has already been cancelled and refunded.");
+    throw new ApiError(
+      400,
+      "This booking has already been cancelled and refunded.",
+    );
   }
 
   if (booking.paymentStatus === "FAILED") {
@@ -57,7 +59,10 @@ export const cancelBooking = asyncHandler(async (req, res) => {
 
   const now = new Date();
   if (new Date(event.startDate) <= now) {
-    throw new ApiError(400, "Cannot cancel booking. The event has already started or completed.");
+    throw new ApiError(
+      400,
+      "Cannot cancel booking. The event has already started or completed.",
+    );
   }
 
   let modified = false;
@@ -73,7 +78,10 @@ export const cancelBooking = asyncHandler(async (req, res) => {
   });
 
   event.seatMap.forEach((seat) => {
-    if (seat.bookingId && seat.bookingId.toString() === booking._id.toString()) {
+    if (
+      seat.bookingId &&
+      seat.bookingId.toString() === booking._id.toString()
+    ) {
       seat.status = "AVAILABLE";
       seat.heldBy = null;
       seat.heldUntil = null;
@@ -98,5 +106,67 @@ export const cancelBooking = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, booking, "Booking successfully cancelled and tickets refunded."));
+    .json(
+      new ApiResponse(
+        200,
+        booking,
+        "Booking successfully cancelled and tickets refunded.",
+      ),
+    );
+});
+
+export const getAllBookings = asyncHandler(async (req, res) => {
+  const user = req.user;
+
+  if (!user) {
+    throw new ApiError(401, "Authentication required.");
+  }
+
+  if (user.role !== "ORGANIZER") {
+    throw new ApiError(403, "You are not authorized to view these bookings.");
+  }
+
+  const { status, eventId, event } = req.query;
+  const query = {};
+
+  const organizerEvents = await eventModal
+    .find({
+      organizerId: user._id,
+      isDeleted: { $ne: true },
+    })
+    .select("_id");
+
+  const organizerEventIds = organizerEvents.map((e) => e._id);
+
+  const filterEventId = eventId || event;
+  if (filterEventId) {
+    const hasAccess = organizerEventIds.some(
+      (id) => id.toString() === filterEventId.toString(),
+    );
+    if (!hasAccess) {
+      return res
+        .status(200)
+        .json(new ApiResponse(200, [], "Bookings retrieved successfully."));
+    }
+    query.eventId = filterEventId;
+  } else {
+    query.eventId = { $in: organizerEventIds };
+  }
+
+  if (status) {
+    query.paymentStatus = status.toUpperCase();
+  }
+
+  const bookings = await bookingModel
+    .find(query)
+    .populate("userId", "username email avatar")
+    .populate(
+      "eventId",
+      "title description startDate venue bannerUrl category city",
+    )
+    .sort({ createdAt: -1 });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, bookings, "Bookings retrieved successfully."));
 });

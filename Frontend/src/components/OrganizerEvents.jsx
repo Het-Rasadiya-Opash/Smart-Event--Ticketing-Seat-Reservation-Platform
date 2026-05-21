@@ -96,8 +96,6 @@ const OrganizerEvents = () => {
     0,
   );
 
-  console.log(events);
-
   return (
     <div className="space-y-6">
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
@@ -196,6 +194,7 @@ const OrganizerEvents = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          
           {events.map((event) => {
             const status = STATUS_CONFIG[event.status] || STATUS_CONFIG.DRAFT;
             const StatusIcon = status.icon;
