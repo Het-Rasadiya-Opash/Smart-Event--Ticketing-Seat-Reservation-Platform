@@ -6,14 +6,12 @@ import { useSelector } from "react-redux";
 import {
   CalendarDays,
   Ticket,
-  AlertTriangle,
   Trash2,
-  X,
   ArrowLeft,
-  ShieldAlert,
   BadgeInfo,
 } from "lucide-react";
 import { formatDate } from "../utils/utilities";
+import CancelBooking from "./CancelBooking";
 
 const MyBooking = () => {
   const { currentUser } = useSelector((state) => state.users);
@@ -26,7 +24,6 @@ const MyBooking = () => {
   const [loadingBookings, setLoadingBookings] = useState(false);
 
   const [bookingToCancel, setBookingToCancel] = useState(null);
-  const [cancellingId, setCancellingId] = useState(null);
 
   const isOrganizer = currentUser?.role === "ORGANIZER";
   const isFullPage = location.pathname === "/bookings";
@@ -87,35 +84,11 @@ const MyBooking = () => {
     if (currentUser && currentUser.role !== "ORGANIZER") {
       fetchBookings();
     }
+    ``;
   }, [currentUser]);
 
   const handleCancelClick = (booking) => {
     setBookingToCancel(booking);
-  };
-
-  const confirmCancelBooking = async () => {
-    if (!bookingToCancel) return;
-    setCancellingId(bookingToCancel._id);
-    try {
-      const res = await apiRequest.post(
-        `/bookings/${bookingToCancel._id}/cancel`,
-      );
-      if (res.data?.success) {
-        toast.success(
-          "Booking successfully cancelled. Seats have been released!",
-        );
-        setBookingToCancel(null);
-        fetchBookings();
-      }
-    } catch (err) {
-      console.error("Cancellation error:", err);
-      toast.error(
-        err.response?.data?.message ||
-          "Could not cancel booking. Please try again.",
-      );
-    } finally {
-      setCancellingId(null);
-    }
   };
 
   if (verifying) {
@@ -319,10 +292,6 @@ const MyBooking = () => {
                   <Ticket className="w-8 h-8 text-green-500" />
                   My Booking History
                 </h1>
-                <p className="text-slate-450 text-sm mt-1">
-                  Manage your tickets, check seat details, and request
-                  cancellations.
-                </p>
               </div>
               <button
                 onClick={() => navigate("/events")}
@@ -339,80 +308,14 @@ const MyBooking = () => {
         {!isOrganizer && renderBookingsContent()}
       </div>
 
-      {bookingToCancel && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
-          <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="bg-rose-50 border-b border-rose-100 px-6 py-5 flex items-start gap-4">
-              <div className="bg-rose-100 p-2.5 rounded-2xl shrink-0">
-                <AlertTriangle className="w-6 h-6 text-rose-600" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-slate-900">
-                  Cancel Ticket Reservation?
-                </h3>
-                <p className="text-xs text-rose-700 font-semibold mt-0.5 uppercase tracking-wider">
-                  Important Policy Information
-                </p>
-              </div>
-              <button
-                onClick={() => setBookingToCancel(null)}
-                className="text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 p-1 transition-colors ml-auto focus:outline-none"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="p-6 space-y-4">
-              <div className="space-y-2 text-sm text-slate-600 leading-relaxed">
-                <p>
-                  Are you sure you want to cancel your tickets for the event:
-                </p>
-                <p className="font-extrabold text-slate-950 bg-slate-50 border border-slate-150 p-3 rounded-xl">
-                  {bookingToCancel.eventId?.title}
-                </p>
-                <div className="flex items-start gap-2 bg-amber-50 border border-amber-150 p-3.5 rounded-xl mt-2 text-xs text-amber-800">
-                  <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-bold">Seats to be Released:</span>{" "}
-                    {bookingToCancel.seats.map((s) => s.seatId).join(", ")}
-                    <p className="mt-1 font-medium text-amber-700">
-                      These seats will be returned back to the event seat map
-                      and will be made immediately bookable by others.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3">
-              <button
-                onClick={() => setBookingToCancel(null)}
-                disabled={cancellingId !== null}
-                className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-800 hover:bg-slate-100 transition-all cursor-pointer disabled:opacity-50"
-              >
-                No, Keep Booking
-              </button>
-              <button
-                onClick={confirmCancelBooking}
-                disabled={cancellingId !== null}
-                className="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition-all shadow-md hover:shadow-lg shadow-rose-600/10 active:scale-95 cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
-              >
-                {cancellingId ? (
-                  <>
-                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Cancelling...
-                  </>
-                ) : (
-                  <>
-                    <Trash2 className="w-3.5 h-3.5" />
-                    Yes, Cancel Reservation
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <CancelBooking
+        booking={bookingToCancel}
+        onClose={() => setBookingToCancel(null)}
+        onSuccess={() => {
+          setBookingToCancel(null);
+          fetchBookings();
+        }}
+      />
     </div>
   );
 };
