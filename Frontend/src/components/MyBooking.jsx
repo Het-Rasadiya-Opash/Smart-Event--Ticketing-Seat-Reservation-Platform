@@ -1,20 +1,35 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router";
+import { useNavigate, useSearchParams, useLocation } from "react-router";
 import apiRequest from "../utils/apiRequest";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
-import { CalendarDays, Ticket } from "lucide-react";
+import {
+  CalendarDays,
+  Ticket,
+  AlertTriangle,
+  Trash2,
+  X,
+  ArrowLeft,
+  ShieldAlert,
+  BadgeInfo,
+} from "lucide-react";
 import { formatDate } from "../utils/utilities";
+
 const MyBooking = () => {
   const { currentUser } = useSelector((state) => state.users);
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [verifying, setVerifying] = useState(false);
   const [bookings, setBookings] = useState([]);
   const [loadingBookings, setLoadingBookings] = useState(false);
 
+  const [bookingToCancel, setBookingToCancel] = useState(null);
+  const [cancellingId, setCancellingId] = useState(null);
+
   const isOrganizer = currentUser?.role === "ORGANIZER";
+  const isFullPage = location.pathname === "/bookings";
 
   useEffect(() => {
     const payment = searchParams.get("payment");
@@ -74,6 +89,35 @@ const MyBooking = () => {
     }
   }, [currentUser]);
 
+  const handleCancelClick = (booking) => {
+    setBookingToCancel(booking);
+  };
+
+  const confirmCancelBooking = async () => {
+    if (!bookingToCancel) return;
+    setCancellingId(bookingToCancel._id);
+    try {
+      const res = await apiRequest.post(
+        `/bookings/${bookingToCancel._id}/cancel`,
+      );
+      if (res.data?.success) {
+        toast.success(
+          "Booking successfully cancelled. Seats have been released!",
+        );
+        setBookingToCancel(null);
+        fetchBookings();
+      }
+    } catch (err) {
+      console.error("Cancellation error:", err);
+      toast.error(
+        err.response?.data?.message ||
+          "Could not cancel booking. Please try again.",
+      );
+    } finally {
+      setCancellingId(null);
+    }
+  };
+
   if (verifying) {
     return (
       <div className="fixed inset-0 z-50 bg-slate-900/65 backdrop-blur-md flex flex-col items-center justify-center text-white animate-in fade-in duration-300">
@@ -90,131 +134,283 @@ const MyBooking = () => {
     );
   }
 
-  return (
-    <div>
-      {!isOrganizer && (
-        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden p-6 space-y-6">
+  const renderBookingsContent = () => {
+    return (
+      <div className="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden p-6 space-y-6">
+        {!isFullPage && (
           <div className="flex items-center gap-2 border-b border-slate-100 pb-4">
-            <Ticket className="w-4 h-4 text-green-500" />
-            <h2 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+            <Ticket className="w-5 h-5 text-green-600" />
+            <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wider">
               My Bookings & Tickets
             </h2>
           </div>
+        )}
 
-          {loadingBookings ? (
-            <div className="flex items-center justify-center py-10">
-              <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+        {loadingBookings ? (
+          <div className="flex items-center justify-center py-16">
+            <div className="w-10 h-10 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : bookings.length === 0 ? (
+          <div className="text-center py-16 px-4 border border-dashed border-slate-200 rounded-2xl bg-slate-50/50">
+            <div className="bg-slate-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Ticket className="w-8 h-8 text-slate-400 stroke-[1.5]" />
             </div>
-          ) : bookings.length === 0 ? (
-            <div className="text-center py-12 px-4 border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
-              <Ticket className="w-12 h-12 text-slate-350 mx-auto mb-3 stroke-[1.5]" />
-              <h3 className="text-sm font-bold text-slate-700 mb-1">
-                No Tickets Booked Yet
-              </h3>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto mb-4 leading-relaxed">
-                You haven't purchased tickets for any events. Browse our
-                upcoming events and reserve your seats!
-              </p>
-              <button
-                onClick={() => navigate("/events")}
-                className="bg-green-600 hover:bg-green-700 text-white font-semibold text-xs px-4 py-2 rounded-xl transition-all shadow-md active:scale-95 cursor-pointer"
-              >
-                Explore Event
-              </button>
-            </div>
-          ) : (
-            <div className="grid gap-6">
-              {bookings.map((booking) => {
-                const event = booking.eventId;
-                const isCompleted = booking.paymentStatus === "COMPLETED";
-                const isFailed = booking.paymentStatus === "FAILED";
+            <h3 className="text-lg font-bold text-slate-800 mb-1">
+              No Tickets Booked Yet
+            </h3>
+            <p className="text-sm text-slate-500 max-w-sm mx-auto mb-6 leading-relaxed">
+              You haven't purchased tickets for any events. Browse our upcoming
+              events and reserve your seats!
+            </p>
+            <button
+              onClick={() => navigate("/events")}
+              className="bg-green-600 hover:bg-green-700 text-white font-semibold text-sm px-6 py-2.5 rounded-xl transition-all shadow-md hover:shadow-lg active:scale-95 cursor-pointer inline-flex items-center gap-2"
+            >
+              Explore Events
+            </button>
+          </div>
+        ) : (
+          <div className="grid gap-6">
+            {bookings.map((booking) => {
+              const event = booking.eventId;
+              const isCompleted = booking.paymentStatus === "COMPLETED";
+              const isFailed = booking.paymentStatus === "FAILED";
+              const isRefunded = booking.paymentStatus === "REFUNDED";
 
-                let statusBadge = "";
-                if (isCompleted) {
-                  statusBadge =
-                    "bg-emerald-50 text-emerald-700 border-emerald-200";
-                } else if (isFailed) {
-                  statusBadge = "bg-rose-50 text-rose-700 border-rose-200";
-                } else {
-                  statusBadge = "bg-amber-50 text-amber-700 border-amber-200";
-                }
+              let statusBadge = "";
+              let statusLabel = booking.paymentStatus;
+              if (isCompleted) {
+                statusBadge =
+                  "bg-emerald-50 text-emerald-700 border-emerald-200";
+              } else if (isFailed) {
+                statusBadge = "bg-rose-50 text-rose-700 border-rose-200";
+              } else if (isRefunded) {
+                statusBadge = "bg-red-50 text-red-600 border-red-200";
+                statusLabel = "CANCELLED & REFUNDED";
+              } else {
+                statusBadge = "bg-amber-50 text-amber-700 border-amber-200";
+              }
 
-                const formattedDate = event?.startDate
-                  ? formatDate(event.startDate)
-                  : "N/A";
+              const formattedDate = event?.startDate
+                ? formatDate(event.startDate)
+                : "N/A";
 
-                return (
-                  <div
-                    key={booking._id}
-                    className="border border-slate-200/80 rounded-2xl overflow-hidden flex flex-col md:flex-row shadow-sm hover:shadow-md transition-shadow bg-white"
-                  >
-                    {/* Left: Event Banner */}
-                    <div className="md:w-44 h-36 md:h-auto relative bg-slate-100 shrink-0">
-                      {event?.bannerUrl ? (
-                        <img
-                          src={event.bannerUrl}
-                          alt={event.title}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-slate-900/10 text-slate-400 font-bold uppercase tracking-widest text-xs">
-                          {event?.category || "EVENT"}
-                        </div>
-                      )}
-                      <span className="absolute top-2 left-2 text-[9px] font-black uppercase tracking-wider bg-slate-900/70 backdrop-blur-md text-white px-2 py-0.5 rounded-md">
-                        {event?.category || "General"}
-                      </span>
+              const isEventFuture =
+                event?.startDate && new Date(event.startDate) > new Date();
+              const canCancel =
+                isEventFuture &&
+                ["COMPLETED", "PENDING"].includes(booking.paymentStatus);
+
+              return (
+                <div
+                  key={booking._id}
+                  className="border border-slate-200 rounded-2xl overflow-hidden flex flex-col md:flex-row shadow-sm hover:shadow-md transition-all duration-300 bg-white group hover:border-slate-300"
+                >
+                  <div className="md:w-52 h-40 md:h-auto relative bg-slate-100 shrink-0 overflow-hidden">
+                    {event?.bannerUrl ? (
+                      <img
+                        src={event.bannerUrl}
+                        alt={event.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-slate-900/10 text-slate-400 font-bold uppercase tracking-widest text-xs">
+                        {event?.category || "EVENT"}
+                      </div>
+                    )}
+                    <span className="absolute top-3 left-3 text-[10px] font-black uppercase tracking-wider bg-slate-900/75 backdrop-blur-md text-white px-2.5 py-1 rounded-lg">
+                      {event?.category || "General"}
+                    </span>
+                  </div>
+
+                  <div className="flex-1 p-5 md:p-6 flex flex-col justify-between gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                      <div>
+                        <h3 className="text-lg font-bold text-slate-950 leading-snug group-hover:text-green-700 transition-colors">
+                          {event?.title || "Unknown Event"}
+                        </h3>
+                        <p className="text-xs text-slate-500 mt-1.5 flex items-center gap-1.5 font-medium">
+                          <CalendarDays className="w-4 h-4 shrink-0 text-slate-400" />
+                          {formattedDate} • {event?.venue}, {event?.city}
+                        </p>
+                      </div>
+                      <div className="flex flex-col sm:items-end gap-2 shrink-0">
+                        <span
+                          className={`inline-flex items-center text-[10px] font-extrabold uppercase px-3 py-1 rounded-full border tracking-wider ${statusBadge}`}
+                        >
+                          {statusLabel}
+                        </span>
+                        {!isEventFuture && !isRefunded && (
+                          <span className="text-[10px] font-semibold text-slate-400 flex items-center gap-1 bg-slate-100 px-2 py-0.5 rounded">
+                            <BadgeInfo className="w-3 h-3 text-slate-400" />{" "}
+                            Event has started
+                          </span>
+                        )}
+                      </div>
                     </div>
 
-                    <div className="flex-1 p-5 flex flex-col justify-between gap-4">
-                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
-                        <div>
-                          <h3 className="text-base font-bold text-slate-900 leading-snug truncate max-w-md">
-                            {event?.title || "Unknown Event"}
-                          </h3>
-                          <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
-                            <CalendarDays className="w-3.5 h-3.5 shrink-0" />
-                            {formattedDate} • {event?.venue}, {event?.city}
-                          </p>
-                        </div>
-                        <span
-                          className={`inline-flex items-center text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full border shrink-0 ${statusBadge}`}
-                        >
-                          {booking.paymentStatus}
+                    <div className="bg-slate-50/80 border border-slate-200/50 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div>
+                        <span className="text-[10px] text-slate-400 font-black uppercase tracking-wider block mb-1.5">
+                          Seats Booked ({booking.seats.length})
                         </span>
-                      </div>
-
-                      <div className="bg-slate-50 border border-slate-200/50 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div>
-                          <span className="text-[10px] text-slate-400 font-black uppercase tracking-wider block mb-1">
-                            Seats Booked ({booking.seats.length})
-                          </span>
-                          <div className="flex flex-wrap gap-1.5">
-                            {booking.seats.map((s) => (
-                              <span
-                                key={s.seatId}
-                                className="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-xs font-bold text-slate-700"
-                              >
-                                {s.seatId}
+                        <div className="flex flex-wrap gap-1.5">
+                          {booking.seats.map((s) => (
+                            <span
+                              key={s.seatId}
+                              className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-xs font-bold text-slate-700 shadow-sm"
+                            >
+                              {s.seatId}{" "}
+                              <span className="text-[10px] text-slate-450 font-normal">
+                                ({s.tier})
                               </span>
-                            ))}
-                          </div>
+                            </span>
+                          ))}
                         </div>
-                        <div className="sm:text-right shrink-0">
+                      </div>
+                      <div className="flex items-center justify-between sm:justify-start sm:gap-6 shrink-0 border-t border-slate-150 sm:border-0 pt-3 sm:pt-0">
+                        <div className="sm:text-right">
                           <span className="text-[10px] text-slate-400 font-black uppercase tracking-wider block mb-0.5">
                             Total Paid
                           </span>
-                          <span className="text-base font-black text-slate-900">
+                          <span className="text-lg font-black text-slate-900">
                             ₹{booking.totalAmount?.toLocaleString()}
                           </span>
                         </div>
+                        {canCancel && (
+                          <button
+                            onClick={() => handleCancelClick(booking)}
+                            className="bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 hover:text-rose-700 font-bold text-xs px-4 py-2 rounded-xl transition-all shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95 shrink-0"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            Cancel Tickets
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
-                );
-              })}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className={isFullPage ? "min-h-screen bg-slate-50 pb-20" : ""}>
+      {isFullPage && (
+        <div className="relative bg-slate-900 overflow-hidden py-12 shadow-inner">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-green-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
+            <button
+              onClick={() => navigate("/profile")}
+              className="flex items-center gap-1.5 text-slate-400 hover:text-white text-xs font-semibold uppercase tracking-wider mb-4 transition-colors focus:outline-none"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Profile
+            </button>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <h1 className="text-3xl font-extrabold text-white tracking-tight flex items-center gap-2">
+                  <Ticket className="w-8 h-8 text-green-500" />
+                  My Booking History
+                </h1>
+                <p className="text-slate-450 text-sm mt-1">
+                  Manage your tickets, check seat details, and request
+                  cancellations.
+                </p>
+              </div>
+              <button
+                onClick={() => navigate("/events")}
+                className="bg-green-600 hover:bg-green-700 text-white font-semibold text-xs px-4 py-2.5 rounded-xl transition-all shadow-lg shadow-green-600/20 active:scale-95 shrink-0"
+              >
+                Browse Events
+              </button>
             </div>
-          )}
+          </div>
+        </div>
+      )}
+
+      <div className={isFullPage ? "max-w-4xl mx-auto px-4 sm:px-6 mt-8" : ""}>
+        {!isOrganizer && renderBookingsContent()}
+      </div>
+
+      {bookingToCancel && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="bg-rose-50 border-b border-rose-100 px-6 py-5 flex items-start gap-4">
+              <div className="bg-rose-100 p-2.5 rounded-2xl shrink-0">
+                <AlertTriangle className="w-6 h-6 text-rose-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-900">
+                  Cancel Ticket Reservation?
+                </h3>
+                <p className="text-xs text-rose-700 font-semibold mt-0.5 uppercase tracking-wider">
+                  Important Policy Information
+                </p>
+              </div>
+              <button
+                onClick={() => setBookingToCancel(null)}
+                className="text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 p-1 transition-colors ml-auto focus:outline-none"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div className="space-y-2 text-sm text-slate-600 leading-relaxed">
+                <p>
+                  Are you sure you want to cancel your tickets for the event:
+                </p>
+                <p className="font-extrabold text-slate-950 bg-slate-50 border border-slate-150 p-3 rounded-xl">
+                  {bookingToCancel.eventId?.title}
+                </p>
+                <div className="flex items-start gap-2 bg-amber-50 border border-amber-150 p-3.5 rounded-xl mt-2 text-xs text-amber-800">
+                  <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold">Seats to be Released:</span>{" "}
+                    {bookingToCancel.seats.map((s) => s.seatId).join(", ")}
+                    <p className="mt-1 font-medium text-amber-700">
+                      These seats will be returned back to the event seat map
+                      and will be made immediately bookable by others.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3">
+              <button
+                onClick={() => setBookingToCancel(null)}
+                disabled={cancellingId !== null}
+                className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-800 hover:bg-slate-100 transition-all cursor-pointer disabled:opacity-50"
+              >
+                No, Keep Booking
+              </button>
+              <button
+                onClick={confirmCancelBooking}
+                disabled={cancellingId !== null}
+                className="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition-all shadow-md hover:shadow-lg shadow-rose-600/10 active:scale-95 cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+              >
+                {cancellingId ? (
+                  <>
+                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Cancelling...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-3.5 h-3.5" />
+                    Yes, Cancel Reservation
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

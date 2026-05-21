@@ -214,7 +214,7 @@ eventSchema.virtual("availableSeats").get(function () {
 });
 
 eventSchema.virtual("soldSeats").get(function () {
-  return this.seatMap.filter((s) => s.status === "sold").length;
+  return this.seatMap.filter((s) => s.status === "SOLD").length;
 });
 
 eventSchema.virtual("isSaleOpen").get(function () {
@@ -273,6 +273,9 @@ eventSchema.pre("save", function () {
     this.analytics.heldSeats = this.seatMap.filter(
       (s) => s.status === "HELD",
     ).length;
+    this.analytics.totalRevenue = this.seatMap
+      .filter((s) => s.status === "SOLD")
+      .reduce((sum, s) => sum + s.price, 0);
   }
 });
 

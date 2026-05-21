@@ -11,6 +11,7 @@ import { useDispatch } from "react-redux";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CreateEvent from "./pages/CreateEvent";
 import Profile from "./pages/Profile";
+import MyBooking from "./components/MyBooking";
 
 const App = () => {
   const location = useLocation();
@@ -26,7 +27,7 @@ const App = () => {
 
     const checkAuth = async () => {
       try {
-        const response = await apiRequest.get("/users");
+        const response = await apiRequest.get("/users", { skipToast: true });
         const user = response.data.data;
         dispatch(setCurrentUser(user));
       } catch (err) {
@@ -48,6 +49,9 @@ const App = () => {
         <Route path="/profile" element={<Profile />} />
         <Route element={<ProtectedRoute allowedRoles={["ORGANIZER"]} />}>
           <Route path="/create-event" element={<CreateEvent />} />
+        </Route>
+        <Route element={<ProtectedRoute allowedRoles={["CUSTOMER"]} />}>
+          <Route path="/bookings" element={<MyBooking />} />
         </Route>
       </Routes>
     </div>

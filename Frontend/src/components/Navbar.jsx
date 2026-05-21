@@ -128,6 +128,16 @@ const Navbar = () => {
                         <User className="w-4 h-4" />
                         My Profile
                       </NavLink>
+                      {currentUser.role !== "ORGANIZER" && (
+                        <NavLink
+                          to="/bookings"
+                          className={dropdownLinkClass}
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          <Ticket className="w-4 h-4" />
+                          My Bookings
+                        </NavLink>
+                      )}
                       {currentUser.role === "ORGANIZER" && (
                         <NavLink
                           to="/create-event"
@@ -233,6 +243,16 @@ const Navbar = () => {
                     <User className="w-5 h-5 text-gray-500" />
                     My Profile
                   </NavLink>
+                  {currentUser.role !== "ORGANIZER" && (
+                    <NavLink
+                      to="/bookings"
+                      className={mobileLinkClass}
+                      onClick={toggleMobileMenu}
+                    >
+                      <Ticket className="w-5 h-5 text-gray-500" />
+                      My Bookings
+                    </NavLink>
+                  )}
                   {currentUser.role === "ORGANIZER" && (
                     <NavLink
                       to="/create-event"

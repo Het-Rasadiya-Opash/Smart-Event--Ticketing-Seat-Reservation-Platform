@@ -70,9 +70,11 @@ const OrganizerEvents = () => {
   const handleStatusChange = async (eventId, newStatus) => {
     setStatusLoading(eventId);
     try {
-      await apiRequest.patch(`/events/status/${eventId}`, { status: newStatus });
+      await apiRequest.patch(`/events/status/${eventId}`, {
+        status: newStatus,
+      });
       setEvents((prev) =>
-        prev.map((e) => (e._id === eventId ? { ...e, status: newStatus } : e))
+        prev.map((e) => (e._id === eventId ? { ...e, status: newStatus } : e)),
       );
     } catch (err) {
       setError(err.response?.data?.message || "Failed to update status.");
@@ -93,6 +95,8 @@ const OrganizerEvents = () => {
     (s, e) => s + (e.analytics?.totalRevenue || 0),
     0,
   );
+
+  console.log(events);
 
   return (
     <div className="space-y-6">
@@ -314,19 +318,23 @@ const OrganizerEvents = () => {
                           <div className="relative">
                             <select
                               value={event.status}
-                              onChange={(e) => handleStatusChange(event._id, e.target.value)}
+                              onChange={(e) =>
+                                handleStatusChange(event._id, e.target.value)
+                              }
                               className={`appearance-none text-xs font-semibold pl-2.5 pr-7 py-2 rounded-xl border cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-500/20 transition-all ${
                                 event.status === "PUBLISHED"
                                   ? "bg-green-50 border-green-200 text-green-700"
                                   : event.status === "CANCELLED"
-                                  ? "bg-red-50 border-red-200 text-red-600"
-                                  : event.status === "COMPLETED"
-                                  ? "bg-blue-50 border-blue-200 text-blue-600"
-                                  : "bg-slate-100 border-slate-200 text-slate-600"
+                                    ? "bg-red-50 border-red-200 text-red-600"
+                                    : event.status === "COMPLETED"
+                                      ? "bg-blue-50 border-blue-200 text-blue-600"
+                                      : "bg-slate-100 border-slate-200 text-slate-600"
                               }`}
                             >
                               {STATUSES.map((s) => (
-                                <option key={s} value={s}>{s}</option>
+                                <option key={s} value={s}>
+                                  {s}
+                                </option>
                               ))}
                             </select>
                             <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none text-slate-400" />

@@ -310,7 +310,6 @@ const SeatMap = ({
                                   <Check className="w-3 h-3 stroke-[3]" />
                                 );
                               } else {
-                                // Available
                                 seatClass = `border ${getTierColor(seat.tier)}`;
                               }
 

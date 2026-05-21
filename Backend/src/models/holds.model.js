@@ -56,7 +56,6 @@ const holdSchema = new Schema(
   },
 );
 
-// Virtual to check if the hold has expired
 holdSchema.virtual("isExpired").get(function () {
   return new Date() > this.heldUntil;
 });
