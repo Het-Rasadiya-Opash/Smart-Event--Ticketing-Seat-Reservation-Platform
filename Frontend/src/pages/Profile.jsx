@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useSearchParams } from "react-router";
 import OrganizerEvents from "../components/OrganizerEvents";
+import OrganizerAnalytics from "../components/OrganizerAnalytics";
 import {
   User,
   Mail,
@@ -9,6 +10,8 @@ import {
   CalendarDays,
   CalendarPlus,
   Ticket,
+  BarChart3,
+  Layers,
 } from "lucide-react";
 import { formatDate } from "../utils/utilities";
 import apiRequest from "../utils/apiRequest";
@@ -16,9 +19,20 @@ import toast from "react-hot-toast";
 import MyBooking from "../components/MyBooking";
 import OrganizerGetAllBookings from "../components/OrganizerGetAllBookings";
 
+const InfoRow = ({ icon, label, value }) => (
+  <div className="flex items-center justify-between px-6 py-4">
+    <div className="flex items-center gap-2.5">
+      {icon}
+      <span className="text-sm text-slate-500 font-medium">{label}</span>
+    </div>
+    <span className="text-sm font-semibold text-slate-800">{value}</span>
+  </div>
+);
+
 const Profile = () => {
   const { currentUser } = useSelector((state) => state.users);
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("analytics");
 
   if (!currentUser) return null;
 
@@ -30,7 +44,7 @@ const Profile = () => {
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-green-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6">
             <div className="relative shrink-0">
               <img
@@ -73,8 +87,8 @@ const Profile = () => {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 mt-8 space-y-6">
-        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-6">
+        {/* <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
           <div className="flex items-center gap-2 px-6 py-4 border-b border-slate-100">
             <User className="w-4 h-4 text-green-500" />
             <h2 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
@@ -115,25 +129,54 @@ const Profile = () => {
               value={joinedDate}
             />
           </div>
-        </div>
+        </div> */}
+
+        {isOrganizer && (
+          <div className="flex border border-slate-200 bg-white rounded-2xl p-1.5 shadow-sm">
+            <button
+              onClick={() => setActiveTab("analytics")}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 text-xs font-extrabold rounded-xl transition-all ${
+                activeTab === "analytics"
+                  ? "bg-green-600 text-white shadow-md shadow-slate-900/10"
+                  : "text-slate-700 hover:text-slate-650 hover:bg-slate-100"
+              }`}
+            >
+              <BarChart3 className="w-4 h-4" />
+              <span className="hidden sm:inline">Analytics Dashboard</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("events")}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 text-xs font-extrabold rounded-xl transition-all ${
+                activeTab === "events"
+                  ? "bg-green-600 text-white shadow-md shadow-slate-900/10"
+                  : "text-slate-700 hover:text-slate-650 hover:bg-slate-100"
+              }`}
+            >
+              <Ticket className="w-4 h-4" />
+              <span className="hidden sm:inline">My Events</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("bookings")}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 text-xs font-extrabold rounded-xl transition-all ${
+                activeTab === "bookings"
+                  ? "bg-green-600 text-white shadow-md shadow-slate-900/10"
+                  : "text-slate-700 hover:text-slate-650 hover:bg-slate-100"
+              }`}
+            >
+              <Layers className="w-4 h-4" />
+              <span className="hidden sm:inline">Booking List</span>
+            </button>
+          </div>
+        )}
 
         {!isOrganizer && <MyBooking />}
 
-        {isOrganizer && <OrganizerEvents />}
-        {isOrganizer && <OrganizerGetAllBookings />}
+        {isOrganizer && activeTab === "analytics" && <OrganizerAnalytics />}
+        {isOrganizer && activeTab === "events" && <OrganizerEvents />}
+        {isOrganizer && activeTab === "bookings" && <OrganizerGetAllBookings />}
       </div>
     </div>
   );
 };
-
-const InfoRow = ({ icon, label, value }) => (
-  <div className="flex items-center justify-between px-6 py-4">
-    <div className="flex items-center gap-2.5">
-      {icon}
-      <span className="text-sm text-slate-500 font-medium">{label}</span>
-    </div>
-    <span className="text-sm font-semibold text-slate-800">{value}</span>
-  </div>
-);
 
 export default Profile;

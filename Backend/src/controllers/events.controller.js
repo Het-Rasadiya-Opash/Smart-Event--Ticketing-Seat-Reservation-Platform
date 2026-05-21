@@ -102,6 +102,13 @@ export const createEvent = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, newEvent, "Event created successfully"));
 });
 
+export const draftEvent = asyncHandler(async (req, res) => {
+  const events = await eventModal.find({ status: "DRAFT" });
+  return res
+    .status(200)
+    .json(new ApiResponse(200, events, "Draft Event Fetch Successfully"));
+});
+
 export const getEvents = asyncHandler(async (req, res) => {
   const {
     page = 1,
@@ -578,4 +585,107 @@ export const bookSeats = asyncHandler(async (req, res) => {
         "Seats successfully booked!",
       ),
     );
+});
+
+export const getOrganizerAnalytics = asyncHandler(async (req, res) => {
+  const organizerId = req.user?._id;
+
+  if (!organizerId) {
+    throw new ApiError(401, "Authentication required to view analytics.");
+  }
+
+  const events = await eventModal.find({
+    organizerId,
+    isDeleted: { $ne: true },
+  });
+
+  let totalEvents = events.length;
+  let totalSeats = 0;
+  let seatsSold = 0;
+  let totalRevenue = 0;
+
+  const seatsSoldByTier = { VIP: 0, PREMIUM: 0, STANDARD: 0 };
+  const revenueByTier = { VIP: 0, PREMIUM: 0, STANDARD: 0 };
+  const totalSeatsByTier = { VIP: 0, PREMIUM: 0, STANDARD: 0 };
+
+  const eventDetails = events.map((event) => {
+    const eTotal = event.seatMap.length;
+    const eSold = event.seatMap.filter((s) => s.status === "SOLD").length;
+    const eHeld = event.seatMap.filter((s) => s.status === "HELD").length;
+    const eAvailable = eTotal - eSold - eHeld;
+    const eRevenue = event.seatMap
+      .filter((s) => s.status === "SOLD")
+      .reduce((sum, s) => sum + s.price, 0);
+
+    const eSeatsSoldByTier = { VIP: 0, PREMIUM: 0, STANDARD: 0 };
+    const eRevenueByTier = { VIP: 0, PREMIUM: 0, STANDARD: 0 };
+    const eSeatsTotalByTier = { VIP: 0, PREMIUM: 0, STANDARD: 0 };
+
+    event.seatMap.forEach((seat) => {
+      const tier = seat.tier ? seat.tier.toUpperCase() : "STANDARD";
+      if (eSeatsTotalByTier[tier] !== undefined) {
+        eSeatsTotalByTier[tier]++;
+        totalSeatsByTier[tier]++;
+      }
+      if (seat.status === "SOLD") {
+        if (eSeatsSoldByTier[tier] !== undefined) {
+          eSeatsSoldByTier[tier]++;
+          seatsSoldByTier[tier]++;
+        }
+        if (eRevenueByTier[tier] !== undefined) {
+          eRevenueByTier[tier] += seat.price;
+          revenueByTier[tier] += seat.price;
+        }
+      }
+    });
+
+    totalSeats += eTotal;
+    seatsSold += eSold;
+    totalRevenue += eRevenue;
+
+    const eSellThroughRate =
+      eTotal > 0 ? parseFloat(((eSold / eTotal) * 100).toFixed(2)) : 0;
+
+    return {
+      _id: event._id,
+      title: event.title,
+      startDate: event.startDate,
+      status: event.status,
+      category: event.category,
+      totalSeats: eTotal,
+      soldSeats: eSold,
+      heldSeats: eHeld,
+      availableSeats: eAvailable,
+      totalRevenue: eRevenue,
+      sellThroughRate: eSellThroughRate,
+      seatsSoldByTier: eSeatsSoldByTier,
+      revenueByTier: eRevenueByTier,
+      seatsTotalByTier: eSeatsTotalByTier,
+    };
+  });
+
+  const sellThroughRate =
+    totalSeats > 0
+      ? parseFloat(((seatsSold / totalSeats) * 100).toFixed(2))
+      : 0;
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        summary: {
+          totalEvents,
+          totalSeats,
+          seatsSold,
+          sellThroughRate,
+          totalRevenue,
+          seatsSoldByTier,
+          revenueByTier,
+          totalSeatsByTier,
+        },
+        eventDetails,
+      },
+      "Organizer analytics fetched successfully",
+    ),
+  );
 });

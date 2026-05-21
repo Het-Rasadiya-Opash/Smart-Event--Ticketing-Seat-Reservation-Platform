@@ -105,7 +105,7 @@ const eventSchema = new Schema(
         values: [
           "CONCERT",
           "SPORTS",
-          "THEATRE",
+          "THEATER",
           "CONFERENCE",
           "COMEDY",
           "FESTIVAL",

@@ -54,9 +54,7 @@ const CancelBooking = ({ booking, onClose, onSuccess }) => {
 
         <div className="p-6 space-y-4">
           <div className="space-y-2 text-sm text-slate-600 leading-relaxed">
-            <p>
-              Are you sure you want to cancel your tickets for the event:
-            </p>
+            <p>Are you sure you want to cancel your tickets for the event:</p>
             <p className="font-extrabold text-slate-950 bg-slate-50 border border-slate-150 p-3 rounded-xl">
               {booking.eventId?.title}
             </p>
@@ -65,10 +63,6 @@ const CancelBooking = ({ booking, onClose, onSuccess }) => {
               <div>
                 <span className="font-bold">Seats to be Released:</span>{" "}
                 {booking.seats.map((s) => s.seatId).join(", ")}
-                <p className="mt-1 font-medium text-amber-700">
-                  These seats will be returned back to the event seat map
-                  and will be made immediately bookable by others.
-                </p>
               </div>
             </div>
           </div>

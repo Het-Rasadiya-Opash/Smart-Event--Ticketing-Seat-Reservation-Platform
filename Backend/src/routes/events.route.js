@@ -12,6 +12,8 @@ import {
   holdSeats,
   releaseSeats,
   bookSeats,
+  getOrganizerAnalytics,
+  draftEvent,
 } from "../controllers/events.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 const router = express.Router();
@@ -24,6 +26,8 @@ router.post(
   createEvent,
 );
 
+router.get("/draft", draftEvent);
+
 router.get("/", getEvents);
 
 router.get(
@@ -31,6 +35,13 @@ router.get(
   authMiddleware,
   authorizeRole("ORGANIZER"),
   eventFetchByOrganizer,
+);
+
+router.get(
+  "/organizer/analytics",
+  authMiddleware,
+  authorizeRole("ORGANIZER"),
+  getOrganizerAnalytics,
 );
 
 router.get("/:id", getEventById);

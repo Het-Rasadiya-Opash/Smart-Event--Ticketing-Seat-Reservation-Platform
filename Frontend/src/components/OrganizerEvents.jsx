@@ -99,24 +99,24 @@ const OrganizerEvents = () => {
   return (
     <div className="space-y-6">
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-slate-100">
           <div className="flex items-center gap-2">
-            <Ticket className="w-4 h-4 text-green-500" />
+            <Ticket className="w-4 h-4 text-green-500 shrink-0" />
             <h2 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
               My Events
             </h2>
             {!loading && (
-              <span className="ml-1 bg-green-50 text-green-700 border border-green-200 text-xs font-bold px-2 py-0.5 rounded-full">
+              <span className="ml-1 bg-green-50 text-green-700 border border-green-200 text-xs font-bold px-2 py-0.5 rounded-full shrink-0">
                 {events.length}
               </span>
             )}
           </div>
           <button
             onClick={() => navigate("/create-event")}
-            className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-3 py-1.5 rounded-xl transition-all shadow-md shadow-green-600/10"
+            className="flex items-center justify-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-xl transition-all shadow-md shadow-green-600/10 shrink-0"
           >
             <Plus className="w-3.5 h-3.5" />
-            Create Event
+            <span className="hidden sm:inline">Create Event</span>
           </button>
         </div>
 
