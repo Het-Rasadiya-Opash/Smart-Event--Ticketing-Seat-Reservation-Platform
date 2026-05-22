@@ -13,6 +13,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import CreateEvent from "./pages/CreateEvent";
 import Profile from "./pages/Profile";
 import MyBooking from "./components/MyBooking";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const App = () => {
   const location = useLocation();
@@ -53,6 +54,9 @@ const App = () => {
         </Route>
         <Route element={<ProtectedRoute allowedRoles={["CUSTOMER"]} />}>
           <Route path="/bookings" element={<MyBooking />} />
+        </Route>
+        <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
         </Route>
       </Routes>
       {!hideNavbar && <Footer />}

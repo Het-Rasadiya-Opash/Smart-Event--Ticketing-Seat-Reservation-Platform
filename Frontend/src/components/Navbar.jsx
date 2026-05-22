@@ -9,6 +9,7 @@ import {
   X,
   ChevronDown,
   CalendarPlus,
+  LayoutDashboard,
 } from "lucide-react";
 import apiRequest from "../utils/apiRequest";
 import { logout } from "../features/usersSlice";
@@ -55,9 +56,7 @@ const Navbar = () => {
     }`;
   const mobileLinkClass = ({ isActive }) =>
     `flex items-center gap-2 px-3 py-2 rounded-xl text-base font-medium transition-colors ${
-      isActive
-        ? "bg-green-50 text-green-700"
-        : "text-gray-900 hover:bg-gray-50"
+      isActive ? "bg-green-50 text-green-700" : "text-gray-900 hover:bg-gray-50"
     }`;
 
   return (
@@ -74,17 +73,10 @@ const Navbar = () => {
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
-            <NavLink
-              to="/"
-              end
-              className={desktopNavLinkClass}
-            >
+            <NavLink to="/" end className={desktopNavLinkClass}>
               Home
             </NavLink>
-            <NavLink
-              to="/events"
-              className={desktopNavLinkClass}
-            >
+            <NavLink to="/events" className={desktopNavLinkClass}>
               Events
             </NavLink>
 
@@ -128,7 +120,7 @@ const Navbar = () => {
                         <User className="w-4 h-4" />
                         My Profile
                       </NavLink>
-                      {currentUser.role !== "ORGANIZER" && (
+                      {currentUser.role === "CUSTOMER" && (
                         <NavLink
                           to="/bookings"
                           className={dropdownLinkClass}
@@ -146,6 +138,16 @@ const Navbar = () => {
                         >
                           <CalendarPlus className="w-4 h-4" />
                           Create Event
+                        </NavLink>
+                      )}
+                      {currentUser.role === "ADMIN" && (
+                        <NavLink
+                          to="/admin-dashboard"
+                          className={dropdownLinkClass}
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          <LayoutDashboard className="w-4 h-4" />
+                          Dashboard
                         </NavLink>
                       )}
                       <button
@@ -243,7 +245,7 @@ const Navbar = () => {
                     <User className="w-5 h-5 text-gray-500" />
                     My Profile
                   </NavLink>
-                  {currentUser.role !== "ORGANIZER" && (
+                  {currentUser.role === "CUSTOMER" && (
                     <NavLink
                       to="/bookings"
                       className={mobileLinkClass}
@@ -261,6 +263,16 @@ const Navbar = () => {
                     >
                       <CalendarPlus className="w-5 h-5 text-gray-500" />
                       Create Event
+                    </NavLink>
+                  )}
+                  {currentUser.role === "ADMIN" && (
+                    <NavLink
+                      to="/dashboard"
+                      className={mobileLinkClass}
+                      onClick={toggleMobileMenu}
+                    >
+                      <LayoutDashboard className="w-5 h-5 text-gray-500" />
+                      Dashboard
                     </NavLink>
                   )}
                   <button
